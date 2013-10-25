@@ -17,8 +17,8 @@ public class Reminder extends ReminderBase  {
         super(id);
     }
 
-    public Reminder(Long id, String reminder, String location, String latitude, String longitude, String notify) {
-        super(id, reminder, location, latitude, longitude, notify);
+    public Reminder(Long id, String guid, String reminder, String location, String latitude, String longitude, String notify) {
+        super(id, guid, reminder, location, latitude, longitude, notify);
     }
 
     // KEEP METHODS - put your custom methods here

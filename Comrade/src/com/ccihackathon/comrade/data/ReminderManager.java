@@ -62,13 +62,12 @@ public class ReminderManager {
 		return reminderList;
 	}
 	
-	public void deleteReminder(String latitude, String longitude)
+	public void deleteReminder(String id)
 	{
 		ReminderDao notificationDao = comradeDaoSession.getReminderDao();
 		
 		QueryBuilder<Reminder> queryBuilder = notificationDao.queryBuilder();
-		queryBuilder.where(ReminderDao.Properties.Latitude.eq(latitude));
-		queryBuilder.where(ReminderDao.Properties.Longitude.eq(longitude));
+		queryBuilder.where(ReminderDao.Properties.Guid.eq(id));
 		
 		
 		if(queryBuilder.listLazy().size() != 0)

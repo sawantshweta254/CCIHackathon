@@ -24,6 +24,7 @@ public static void main(String args[]) throws Exception{
 	{
 		Entity notification = schema.addEntity("Reminder");
 		notification.addIdProperty();
+		notification.addStringProperty("guid");
 		notification.addStringProperty("reminder");
 		notification.addStringProperty("location");
 		notification.addStringProperty("latitude");

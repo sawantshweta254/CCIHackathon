@@ -24,11 +24,12 @@ public class ReminderDao extends AbstractDao<Reminder, Long> {
     */
     public static class Properties {
         public final static Property Id =new Property(0, Long.class , "id", true, "_id");
-        public final static Property Reminder =new Property(1, String.class , "reminder", false, "REMINDER");
-        public final static Property Location =new Property(2, String.class , "location", false, "LOCATION");
-        public final static Property Latitude =new Property(3, String.class , "latitude", false, "LATITUDE");
-        public final static Property Longitude =new Property(4, String.class , "longitude", false, "LONGITUDE");
-        public final static Property Notify =new Property(5, String.class , "notify", false, "NOTIFY");
+        public final static Property Guid =new Property(1, String.class , "guid", false, "GUID");
+        public final static Property Reminder =new Property(2, String.class , "reminder", false, "REMINDER");
+        public final static Property Location =new Property(3, String.class , "location", false, "LOCATION");
+        public final static Property Latitude =new Property(4, String.class , "latitude", false, "LATITUDE");
+        public final static Property Longitude =new Property(5, String.class , "longitude", false, "LONGITUDE");
+        public final static Property Notify =new Property(6, String.class , "notify", false, "NOTIFY");
     };
 
 
@@ -45,11 +46,12 @@ public class ReminderDao extends AbstractDao<Reminder, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'REMINDER' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
-                "'REMINDER' TEXT," + // 1: reminder
-                "'LOCATION' TEXT," + // 2: location
-                "'LATITUDE' TEXT," + // 3: latitude
-                "'LONGITUDE' TEXT," + // 4: longitude
-                "'NOTIFY' TEXT);"); // 5: notify
+                "'GUID' TEXT," + // 1: guid
+                "'REMINDER' TEXT," + // 2: reminder
+                "'LOCATION' TEXT," + // 3: location
+                "'LATITUDE' TEXT," + // 4: latitude
+                "'LONGITUDE' TEXT," + // 5: longitude
+                "'NOTIFY' TEXT);"); // 6: notify
     }
 
     /** Drops the underlying database table. */
@@ -70,33 +72,39 @@ public class ReminderDao extends AbstractDao<Reminder, Long> {
 
         }
  
+        String guid = entity.getGuid();
+        if (guid != null) {
+            stmt.bindString(2, guid);
+
+        }
+ 
         String reminder = entity.getReminder();
         if (reminder != null) {
-            stmt.bindString(2, reminder);
+            stmt.bindString(3, reminder);
 
         }
  
         String location = entity.getLocation();
         if (location != null) {
-            stmt.bindString(3, location);
+            stmt.bindString(4, location);
 
         }
  
         String latitude = entity.getLatitude();
         if (latitude != null) {
-            stmt.bindString(4, latitude);
+            stmt.bindString(5, latitude);
 
         }
  
         String longitude = entity.getLongitude();
         if (longitude != null) {
-            stmt.bindString(5, longitude);
+            stmt.bindString(6, longitude);
 
         }
  
         String notify = entity.getNotify();
         if (notify != null) {
-            stmt.bindString(6, notify);
+            stmt.bindString(7, notify);
 
         }
     }
@@ -113,11 +121,12 @@ public class ReminderDao extends AbstractDao<Reminder, Long> {
         Reminder entity = new Reminder( //
 
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0) , // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) , // reminder
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) , // location
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) , // latitude
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) , // longitude
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // notify
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) , // guid
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) , // reminder
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) , // location
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) , // latitude
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) , // longitude
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // notify
         );
         return entity;
     }
@@ -126,11 +135,12 @@ public class ReminderDao extends AbstractDao<Reminder, Long> {
     @Override
     public void readEntity(Cursor cursor, Reminder entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0) );
-        entity.setReminder(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) );
-        entity.setLocation(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) );
-        entity.setLatitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) );
-        entity.setLongitude(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) );
-        entity.setNotify(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) );
+        entity.setGuid(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) );
+        entity.setReminder(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) );
+        entity.setLocation(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) );
+        entity.setLatitude(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) );
+        entity.setLongitude(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) );
+        entity.setNotify(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) );
      }
 
     /** @inheritdoc */

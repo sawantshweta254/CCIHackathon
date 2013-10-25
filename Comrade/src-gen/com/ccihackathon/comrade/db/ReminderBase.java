@@ -15,6 +15,7 @@ package com.ccihackathon.comrade.db;
 abstract public class ReminderBase {
 
     protected Long id;
+    protected String guid;
     protected String reminder;
     protected String location;
     protected String latitude;
@@ -34,8 +35,9 @@ abstract public class ReminderBase {
         this.id = id;
     }
 
-    public ReminderBase(Long id, String reminder, String location, String latitude, String longitude, String notify) {
+    public ReminderBase(Long id, String guid, String reminder, String location, String latitude, String longitude, String notify) {
         this.id = id;
+        this.guid = guid;
         this.reminder = reminder;
         this.location = location;
         this.latitude = latitude;
@@ -49,6 +51,14 @@ abstract public class ReminderBase {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public String getReminder() {
@@ -94,6 +104,10 @@ abstract public class ReminderBase {
     public void updateNotNull(Reminder other) {
         if(other.id != null) {
             this.id = other.id;
+        }
+
+        if(other.guid != null) {
+            this.guid = other.guid;
         }
 
         if(other.reminder != null) {
