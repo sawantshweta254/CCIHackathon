@@ -49,11 +49,11 @@
         <meta-data
 
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBzGkMcVhwdd5FuR7cbvyNcSO0EC31NDUc" />
+            android:value="AIzaSyCB0afk9H8WHxiDCI7-T2Owrd9mQYtI1pE" />
 
         <activity
             android:name="com.ccihackathon.comrade.ReminderActivity"
-            android:label="@string/title_activity_reminder" 
+            android:label="Reminder" 
             android:theme="@android:style/Theme.Dialog">
         </activity>
         
