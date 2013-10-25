@@ -96,6 +96,14 @@ public class MainActivity extends Activity implements LocationListener {
 		addListenersToMap();
 	}
 
+	
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		googleMap = null;
+	}
+
 	// adding on click and drag listeners to the map for adding and removing
 	// markers.
 	private void addListenersToMap() {
@@ -436,7 +444,6 @@ public class MainActivity extends Activity implements LocationListener {
 							String.valueOf(coordinates.latitude), String.valueOf(coordinates.longitude),
 							contactNumberTextView.getText().toString());
 					reminderManager.insertNotification(reminder);
-					Toast.makeText(getActivity(), "" + reminder.getId(), Toast.LENGTH_SHORT).show();
 					
 				}
 			});
