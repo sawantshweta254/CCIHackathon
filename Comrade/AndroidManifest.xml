@@ -47,13 +47,18 @@
         </activity>
 
         <meta-data
+
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBzGkMcVhwdd5FuR7cbvyNcSO0EC31NDUc" />
 
         <activity
             android:name="com.ccihackathon.comrade.ReminderActivity"
-            android:label="@string/title_activity_reminder" >
+            android:label="@string/title_activity_reminder" 
+            android:theme="@android:style/Theme.Dialog">
         </activity>
+        
+        <service android:name="com.ccihackathon.comrade.locationService.GetLocationService"/>  
+
     </application>
 
 </manifest>

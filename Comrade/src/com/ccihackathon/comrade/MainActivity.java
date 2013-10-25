@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.ccihackathon.comrade.data.ReminderManager;
 import com.ccihackathon.comrade.db.Reminder;
+import com.ccihackathon.comrade.locationService.GetLocationService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -72,13 +73,14 @@ public class MainActivity extends Activity implements LocationListener {
 		setupMap();
 
 		addListenersToMap();
+		this.startService(new Intent(MainActivity.this, GetLocationService.class));
 
 	}
 
 	// setting up database for storing user info
 	private void setupDatabase() {
 		reminderManager = new ReminderManager(this);
-
+		
 	}
 
 	// adding on click and drag listeners to the map for adding and removing
