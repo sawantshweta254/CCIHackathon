@@ -80,7 +80,7 @@
             android:textSize="18dp" />
         
         
-         <LinearLayout
+         <LinearLayout 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -93,7 +93,9 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="16dp"
             android:ems="10"
-            android:text="Pick Contact" />
+            android:text="Pick Contact"
+              android:background="@drawable/greenbutton"
+                     style="@style/buttonText" /> />
         
         <TextView
             android:id="@+id/contactNumberTextView"
@@ -110,15 +112,18 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_gravity="center_horizontal|center" 
+        >
 
         <Button
             android:id="@+id/doneButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
+           
             android:layout_marginTop="14dp"
-            android:text="Done" />
+            android:text="Done"
+              android:background="@drawable/bluebutton"
+                     style="@style/buttonText" />
 
         <Button
             android:id="@+id/cancelDialogButton"
@@ -126,7 +131,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="14dp"
-            android:text="Cancel" />
+            android:text="Cancel" 
+              android:background="@drawable/bluebutton"
+                     style="@style/buttonText"/>
     </LinearLayout>
 
 </LinearLayout>
