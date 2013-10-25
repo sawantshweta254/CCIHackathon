@@ -89,29 +89,28 @@ public class GetLocationService extends Service implements LocationListener {
 			if(reminderToShow.getNotify() != null && reminderToShow.getReminder() != "" && reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
 			{
 				notify(reminderToShow);
-				showReminder(reminderToShow.getReminder());
+				showReminder(reminderToShow.getReminder(), reminderToShow.getGuid());
 			}
-			if(reminderToShow.getNotify() != null && reminderToShow.getReminder() != "")
+			if(reminderToShow.getNotify() != null && reminderToShow.getNotify() != "")
 			{
 				notify(reminderToShow);
 			}
 			else if(reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
 			{
-				showReminder(reminderToShow.getReminder());
+				showReminder(reminderToShow.getReminder(), reminderToShow.getGuid());
 			}
 			
 		}
-		
-		showReminder(reminderToShow.getReminder());
 	}
 
-	private void showReminder(String reminderText) {
+	private void showReminder(String reminderText, String reminderID) {
 		Intent intent = new Intent(Intent.ACTION_MAIN).addCategory(
 		        Intent.CATEGORY_LAUNCHER).setClassName(getApplicationContext(),
 		        		ReminderActivity.class.getName()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 		        .addFlags(Intent.FLAG_FROM_BACKGROUND).setComponent(new ComponentName(getApplicationContext(),
 		        		ReminderActivity.class));
 		intent.putExtra(ReminderActivity.REMINDER_TEXT, reminderText);
+		intent.putExtra(ReminderActivity.REMINDER_ID, reminderID);
 		getApplicationContext().startActivity(intent);
 	}
 

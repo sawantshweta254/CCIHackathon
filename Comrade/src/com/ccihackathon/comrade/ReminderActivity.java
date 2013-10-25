@@ -1,5 +1,8 @@
 package com.ccihackathon.comrade;
 
+import com.ccihackathon.comrade.data.ReminderManager;
+import com.ccihackathon.comrade.db.Reminder;
+
 import android.app.Activity;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -39,6 +42,9 @@ public class ReminderActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				ReminderManager reminderManager = new ReminderManager(ReminderActivity.this);
+				reminderManager.deleteReminder(getIntent().getStringExtra(REMINDER_ID));
+				
 				ReminderActivity.this.finish();
 				moveTaskToBack(true); 
 			}
