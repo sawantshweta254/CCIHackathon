@@ -86,7 +86,7 @@ public class GetLocationService extends Service implements LocationListener {
 
 		if(reminderToShow != null)
 		{
-			if(reminderToShow.getNotify() != null && reminderToShow.getReminder() != "" && reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
+			if(reminderToShow.getNotify() != null && reminderToShow.getNotify() != "" && reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
 			{
 				notify(reminderToShow);
 				showReminder(reminderToShow.getReminder(), reminderToShow.getGuid());
@@ -115,12 +115,21 @@ public class GetLocationService extends Service implements LocationListener {
 	}
 
 	private void notify(Reminder reminderToShow) {
+		ReminderManager reminderManager = new ReminderManager(this);
+		reminderManager.deleteReminder(reminderToShow.getGuid());
+		
 		String phoneNumber = reminderToShow.getNotify();
 		String message = "I have reached : " + reminderToShow.getLocation();
 		
-		SmsManager smsManager = SmsManager.getDefault();
-		smsManager.sendTextMessage(phoneNumber, null, message,
-				null, null);
+		if(phoneNumber.trim().length() > 0)
+		{
+			SmsManager smsManager = SmsManager.getDefault();
+			smsManager.sendTextMessage(phoneNumber, null, message,
+					null, null);
+			
+			Toast.makeText(this,"Message Sent To " + reminderToShow.getNotify(), Toast.LENGTH_SHORT).show();
+		}
+		
 	}
 
 	private double getDistanceInKilometers(double latitudeSource,

@@ -23,6 +23,7 @@
              android:layout_centerHorizontal="true"
             android:text="Dismiss"
               android:layout_below="@+id/reminderText"
-               />
+               android:background="@drawable/bluebutton"
+                     style="@style/buttonText"/> />
    
 </RelativeLayout>
