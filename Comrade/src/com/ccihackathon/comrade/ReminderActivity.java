@@ -9,14 +9,27 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class ReminderActivity extends Activity {
+	
+	public static String REMINDER_TEXT = "IntententReminderText";
+	public static String REMINDER_ID = "ReminderID";
+	
 	Button dismissReminderButton;
-
+	TextView reminderTextView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_reminder);
+		
+		reminderTextView = (TextView)findViewById(R.id.reminderText);
+		
+		if(getIntent().getStringExtra(REMINDER_TEXT) != null)
+		{
+			reminderTextView.setText(getIntent().getStringExtra(REMINDER_TEXT));
+		}
 		
 		Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
@@ -27,6 +40,7 @@ public class ReminderActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				ReminderActivity.this.finish();
+				moveTaskToBack(true); 
 			}
 		});
 

@@ -89,7 +89,7 @@ public class GetLocationService extends Service implements LocationListener {
 			if(reminderToShow.getNotify() != null && reminderToShow.getReminder() != "" && reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
 			{
 				notify(reminderToShow);
-				showReminder();
+				showReminder(reminderToShow.getReminder());
 			}
 			if(reminderToShow.getNotify() != null && reminderToShow.getReminder() != "")
 			{
@@ -97,19 +97,21 @@ public class GetLocationService extends Service implements LocationListener {
 			}
 			else if(reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
 			{
-				showReminder();
+				showReminder(reminderToShow.getReminder());
 			}
 			
 		}
 		
+		showReminder(reminderToShow.getReminder());
 	}
 
-	private void showReminder() {
+	private void showReminder(String reminderText) {
 		Intent intent = new Intent(Intent.ACTION_MAIN).addCategory(
 		        Intent.CATEGORY_LAUNCHER).setClassName(getApplicationContext(),
 		        		ReminderActivity.class.getName()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 		        .addFlags(Intent.FLAG_FROM_BACKGROUND).setComponent(new ComponentName(getApplicationContext(),
 		        		ReminderActivity.class));
+		intent.putExtra(ReminderActivity.REMINDER_TEXT, reminderText);
 		getApplicationContext().startActivity(intent);
 	}
 
