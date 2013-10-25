@@ -128,9 +128,7 @@ public class MainActivity extends Activity implements LocationListener {
 				reminderList.clear();
 				String id = marker.getId();
 				
-				Toast.makeText(getApplicationContext(), id, Toast.LENGTH_SHORT).show();
-				reminderList = reminderManager.getReminders();
-				reminderManager.deleteReminder(String.valueOf(marker.getPosition().latitude), String.valueOf(marker.getPosition().longitude));
+				reminderManager.deleteReminder(id);
 				marker.remove();
 
 			}
@@ -433,7 +431,7 @@ public class MainActivity extends Activity implements LocationListener {
 				}
 
 				private void insertReminderInDatabase(String string) {
-					Reminder reminder = new Reminder(null, reminderText
+					Reminder reminder = new Reminder(null, string, reminderText
 							.getText().toString(), locationName,
 							String.valueOf(coordinates.latitude), String.valueOf(coordinates.longitude),
 							contactNumberTextView.getText().toString());
