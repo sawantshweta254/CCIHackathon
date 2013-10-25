@@ -1,6 +1,7 @@
 package com.ccihackathon.comrade;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -19,7 +20,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.telephony.SmsManager;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -62,15 +62,12 @@ public class MainActivity extends Activity implements LocationListener {
 	public static EditText reminderText;
 	public static ReminderManager reminderManager;
 	public static boolean remind, notify, both;
+	public static List<Reminder> reminderList = new ArrayList<Reminder>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		setupDatabase();
-		setupMap();
-
-		addListenersToMap();
 		this.startService(new Intent(MainActivity.this, GetLocationService.class));
 
 	}
@@ -78,7 +75,25 @@ public class MainActivity extends Activity implements LocationListener {
 	// setting up database for storing user info
 	private void setupDatabase() {
 		reminderManager = new ReminderManager(this);
+		reminderList = reminderManager.getReminders();
+		for(int i=0 ; i<reminderList.size() ; i++){
+			MarkerOptions options = new MarkerOptions().position(new LatLng(Double.valueOf(reminderList.get(i).getLatitude()), Double.valueOf(reminderList.get(i).getLongitude())));
+			options.title(reminderList.get(i).getLocation());
+			options.snippet(reminderList.get(i).getReminder() + reminderList.get(i).getNotify());
+			googleMap.addMarker(options);
+		}
 		
+	}
+	
+	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		setupMap();
+		setupDatabase();
+		addListenersToMap();
 	}
 
 	// adding on click and drag listeners to the map for adding and removing
