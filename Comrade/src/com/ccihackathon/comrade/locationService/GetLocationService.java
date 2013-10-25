@@ -54,9 +54,6 @@ public class GetLocationService extends Service implements LocationListener {
 	            locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 10, this);
 	            Log.v("Debug", "network_enabled..");
 	        }  
-
-	        // We want this service to continue running until it is explicitly
-	        // stopped, so return sticky.
 	 }
 	
 	@Override
@@ -70,7 +67,17 @@ public class GetLocationService extends Service implements LocationListener {
 		Reminder reminderToShow = null;
 		for (Reminder reminder : reminderList)
 		{
-			if(reminder.getLatitude() == String.valueOf(location.getLatitude()) && reminder.getLatitude() == String.valueOf(location.getLatitude()) )
+			String lat = reminder.getLatitude();
+			String lon = reminder.getLongitude();
+			
+			String lat1 = String.valueOf(location.getLatitude());
+			String lon1 = String.valueOf(location.getLongitude());
+			
+			Log.i("Location Service", "Current Lat : " + lat1 + "Lon : " + lon1 + "Data Lat : " + lat + "lon : " + lon);
+			
+			//Check for a distance of 1 kilometer
+			double distance = getDistanceInKilometers(Double.valueOf(reminder.getLatitude()), Double.valueOf(reminder.getLongitude()), location.getLatitude(), location.getLongitude());
+			if(distance <= 1)
 			{
 				reminderToShow = reminder;
 				break;
@@ -79,17 +86,17 @@ public class GetLocationService extends Service implements LocationListener {
 
 		if(reminderToShow != null)
 		{
+			if(reminderToShow.getNotify() != null && reminderToShow.getReminder() != "" && reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
+			{
+				notify(reminderToShow);
+				showReminder();
+			}
 			if(reminderToShow.getNotify() != null && reminderToShow.getReminder() != "")
 			{
 				notify(reminderToShow);
 			}
 			else if(reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
 			{
-				showReminder();
-			}
-			else
-			{
-				notify(reminderToShow);
 				showReminder();
 			}
 			
@@ -113,6 +120,30 @@ public class GetLocationService extends Service implements LocationListener {
 		SmsManager smsManager = SmsManager.getDefault();
 		smsManager.sendTextMessage(phoneNumber, null, message,
 				null, null);
+	}
+
+	private double getDistanceInKilometers(double latitudeSource,
+			double longitudeSource, double latitudeDestination,
+			double longitudeDestination) {
+		int radiusOfEarth = 6371;
+		double degreeLatitude = degreeToRadians(latitudeDestination
+				- latitudeSource);
+		double degreeLongitude = degreeToRadians(longitudeDestination
+				- longitudeSource);
+
+		double sinCos = Math.sin(degreeLatitude / 2)
+				* Math.sin(degreeLatitude / 2)
+				+ Math.cos(degreeToRadians(latitudeSource))
+				* Math.cos(degreeToRadians(latitudeDestination))
+				* Math.sin(degreeLongitude / 2) * Math.sin(degreeLongitude / 2);
+
+		double tan = 2 * Math.atan2(Math.sqrt(sinCos), Math.sqrt(1 - sinCos));
+		double distanceInKms = radiusOfEarth * tan;
+		return distanceInKms;
+	}
+
+	private double degreeToRadians(double degree) {
+		return degree * (Math.PI / 180);
 	}
 
 	@Override
