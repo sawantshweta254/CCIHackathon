@@ -86,16 +86,16 @@ public class GetLocationService extends Service implements LocationListener {
 
 		if(reminderToShow != null)
 		{
-			if(reminderToShow.getNotify() != null && reminderToShow.getNotify() != "" && reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
+			if(reminderToShow.getNotify() != null && reminderToShow.getNotify().trim().length() != 0 && reminderToShow.getReminder() != null && reminderToShow.getReminder().trim().length() != 0)
 			{
 				notify(reminderToShow);
 				showReminder(reminderToShow.getReminder(), reminderToShow.getGuid());
 			}
-			if(reminderToShow.getNotify() != null && reminderToShow.getNotify() != "")
+			if(reminderToShow.getNotify() != null && reminderToShow.getNotify().trim().length() != 0)
 			{
 				notify(reminderToShow);
 			}
-			else if(reminderToShow.getReminder() != null && reminderToShow.getReminder() != "")
+			else if(reminderToShow.getReminder() != null && reminderToShow.getReminder().trim().length() != 0)
 			{
 				showReminder(reminderToShow.getReminder(), reminderToShow.getGuid());
 			}
@@ -119,7 +119,7 @@ public class GetLocationService extends Service implements LocationListener {
 		reminderManager.deleteReminder(reminderToShow.getGuid());
 		
 		String phoneNumber = reminderToShow.getNotify();
-		String message = "I have reached : " + reminderToShow.getLocation();
+		String message = "I have reached " + reminderToShow.getLocation();
 		
 		if(phoneNumber.trim().length() > 0)
 		{
