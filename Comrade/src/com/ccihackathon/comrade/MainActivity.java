@@ -25,12 +25,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ccihackathon.comrade.data.ReminderManager;
+import com.ccihackathon.comrade.db.Reminder;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -38,11 +41,12 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.maps.GeoPoint;
 
 public class MainActivity extends Activity implements LocationListener {
-	private GoogleMap googleMap;
-	private double latitude, longitude;
+	private static GoogleMap googleMap;
+	private static double latitude, longitude;
 	public static int PICK_CONTACT = 100;
 	public static LinearLayout remindLinearLayout;
 	public static LinearLayout notifyLinearLayout;
@@ -53,28 +57,46 @@ public class MainActivity extends Activity implements LocationListener {
 	public static String locationName;
 	public static Button cancelDialogButton;
 	public static DialogFragment dialogFragment;
+	public static LatLng coordinates;
+	public static EditText reminderText;
+	public static ReminderManager reminderManager;
+	public static boolean remind, notify, both;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
+		setupDatabase();
+
 		setupMap();
-		
+
 		addListenersToMap();
-		
+
 	}
-	
-	//adding on click and drag listeners to the map for adding and removing markers.
+
+	// setting up database for storing user info
+	private void setupDatabase() {
+		reminderManager = new ReminderManager(this);
+
+	}
+
+	// adding on click and drag listeners to the map for adding and removing
+	// markers.
 	private void addListenersToMap() {
-		
+
 		googleMap.setOnMapClickListener(new OnMapClickListener() {
-			
+
 			@Override
 			public void onMapClick(LatLng point) {
-				locationName = convertPointToLocation(new GeoPoint((int) (point.latitude * 1E6),(int) (point.longitude * 1E6)));
-				double distance = getDistanceInKilometers(point.latitude*1E6, point.longitude*1E6, point.latitude*1E6, point.longitude*1E6);
-				Toast.makeText(getBaseContext(), "" + point, Toast.LENGTH_SHORT).show();
+				locationName = convertPointToLocation(new GeoPoint(
+						(int) (point.latitude * 1E6),
+						(int) (point.longitude * 1E6)));
+				coordinates = point;
+				double distance = getDistanceInKilometers(point.latitude * 1E6,
+						point.longitude * 1E6, point.latitude * 1E6,
+						point.longitude * 1E6);
+
 				dialogFragment = new SetReminderDialogFragment();
 				dialogFragment.setStyle(DialogFragment.STYLE_NORMAL,
 						android.R.style.Theme);
@@ -82,124 +104,122 @@ public class MainActivity extends Activity implements LocationListener {
 						"SetReminderDialogFragment");
 			}
 		});
-		
-		
-		
+
 		googleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
-			
+
 			@Override
 			public void onMarkerDragStart(Marker marker) {
-				//remove marker from map
+				// remove marker from map
+				reminderManager.deleteReminder(String.valueOf(marker.getPosition().latitude), String.valueOf(marker.getPosition().longitude));
 				marker.remove();
-			
+
 			}
-			
+
 			@Override
 			public void onMarkerDragEnd(Marker marker) {
-				
-				
+
 			}
-			
+
 			@Override
 			public void onMarkerDrag(Marker marker) {
-				
-				
+
 			}
 		});
 	}
-	
-	
-	public String convertPointToLocation(GeoPoint point) {   
-        String address = "";
-        Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.getDefault());
-        try {
-            List<Address> addresses = geoCoder.getFromLocation(point.getLatitudeE6()  / 1E6, point.getLongitudeE6() / 1E6, 1);
 
-            if (addresses.size() > 0) {
-                for (int index = 0; index < addresses.get(0).getMaxAddressLineIndex(); index++)
-                    address += addresses.get(0).getAddressLine(index) + " ";
-            }
-        }
-        catch (IOException e) {                
-            e.printStackTrace();
-        }   
+	public String convertPointToLocation(GeoPoint point) {
+		String address = "";
+		Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.getDefault());
+		try {
+			List<Address> addresses = geoCoder.getFromLocation(
+					point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6,
+					1);
 
-        return address;
-    }
+			if (addresses.size() > 0) {
+				for (int index = 0; index < addresses.get(0)
+						.getMaxAddressLineIndex(); index++)
+					address += addresses.get(0).getAddressLine(index) + " ";
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-	//setting up the google map
+		return address;
+	}
+
+	// setting up the google map
 	private void setupMap() {
-		
-		if(googleMap == null){
+
+		if (googleMap == null) {
 			googleMap = ((MapFragment) getFragmentManager().findFragmentById(
 					R.id.map)).getMap();
 		}
-		
-		if(googleMap != null){
+
+		if (googleMap != null) {
 			googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 			googleMap.setMyLocationEnabled(true);
-			
-			
-			LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+			LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 			Criteria criteria = new Criteria();
 			String provider = locationManager.getBestProvider(criteria, true);
 			Location location = locationManager.getLastKnownLocation(provider);
-			if(location!=null){
-                onLocationChanged(location);
-            }
+			if (location != null) {
+				onLocationChanged(location);
+			}
 		}
-		
+
 	}
-	
-	//get distance between two latlng points in kilometers.
-	private double getDistanceInKilometers(double latitudeSource, double longitudeSource, double latitudeDestination, double longitudeDestination){
+
+	// get distance between two latlng points in kilometers.
+	private double getDistanceInKilometers(double latitudeSource,
+			double longitudeSource, double latitudeDestination,
+			double longitudeDestination) {
 		int radiusOfEarth = 6371;
-		double degreeLatitude = degreeToRadians(latitudeDestination - latitudeSource);
-		double degreeLongitude = degreeToRadians(longitudeDestination - longitudeSource);
-		
-		double sinCos = Math.sin(degreeLatitude/2) * Math.sin(degreeLatitude/2) + Math.cos(degreeToRadians(latitudeSource)) * Math.cos(degreeToRadians(latitudeDestination))
-				* Math.sin(degreeLongitude/2) * Math.sin(degreeLongitude/2);
-		
-		double tan = 2 * Math.atan2(Math.sqrt(sinCos), Math.sqrt(1- sinCos));
+		double degreeLatitude = degreeToRadians(latitudeDestination
+				- latitudeSource);
+		double degreeLongitude = degreeToRadians(longitudeDestination
+				- longitudeSource);
+
+		double sinCos = Math.sin(degreeLatitude / 2)
+				* Math.sin(degreeLatitude / 2)
+				+ Math.cos(degreeToRadians(latitudeSource))
+				* Math.cos(degreeToRadians(latitudeDestination))
+				* Math.sin(degreeLongitude / 2) * Math.sin(degreeLongitude / 2);
+
+		double tan = 2 * Math.atan2(Math.sqrt(sinCos), Math.sqrt(1 - sinCos));
 		double distanceInKms = radiusOfEarth * tan;
 		return distanceInKms;
 	}
-	
-	private double degreeToRadians(double degree){
-		return degree * (Math.PI/180);
-	}
 
-	
+	private double degreeToRadians(double degree) {
+		return degree * (Math.PI / 180);
+	}
 
 	@Override
 	public void onLocationChanged(Location location) {
 		latitude = location.getLatitude();
-        longitude = location.getLongitude();
- 
-        LatLng latLng = new LatLng(latitude, longitude);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-		
+		longitude = location.getLongitude();
+
+		LatLng latLng = new LatLng(latitude, longitude);
+		googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
-	
-		
+
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		
-		
+
 	}
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		
-		
+
 	}
-	
-	
+
 	public static class SetReminderDialogFragment extends DialogFragment {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -209,52 +229,69 @@ public class MainActivity extends Activity implements LocationListener {
 			dialog.setCanceledOnTouchOutside(true);
 			dialog.getWindow().setGravity(Gravity.CENTER);
 
-			View view = getActivity().getLayoutInflater().inflate(R.layout.activity_set_reminder_dialog_fragment, null);
+			View view = getActivity().getLayoutInflater().inflate(
+					R.layout.activity_set_reminder_dialog_fragment, null);
 
 			radioSelect = (RadioGroup) view.findViewById(R.id.radioSelect);
 
-			remindLinearLayout = (LinearLayout) view.findViewById(R.id.remindLinearLayout);
+			remindLinearLayout = (LinearLayout) view
+					.findViewById(R.id.remindLinearLayout);
 
-			notifyLinearLayout = (LinearLayout) view.findViewById(R.id.notifyLinearLayout);
+			notifyLinearLayout = (LinearLayout) view
+					.findViewById(R.id.notifyLinearLayout);
 
-			contactNumberTextView = (TextView) view.findViewById(R.id.contactNumberTextView);
+			contactNumberTextView = (TextView) view
+					.findViewById(R.id.contactNumberTextView);
 
 			doneButton = (Button) view.findViewById(R.id.doneButton);
-			cancelDialogButton= (Button) view.findViewById(R.id.cancelDialogButton);
+			cancelDialogButton = (Button) view
+					.findViewById(R.id.cancelDialogButton);
 			locationText = (TextView) view.findViewById(R.id.locationText);
-			
-			locationText.setText(locationName);
+			reminderText = (EditText) view.findViewById(R.id.toDoTextView);
 
+			locationText.setText(locationName);
+			both = true;
 			this.setRadioButtonListeners(view);
 			this.setContactListListeners(view);
 			this.doneButtonListeners(view);
 			this.cancelButtonListeners(view);
 			dialog.setContentView(view);
 			dialog.setCanceledOnTouchOutside(false);
-			dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT,
+					LayoutParams.WRAP_CONTENT);
 
 			return dialog;
 		}
 
 		public void setRadioButtonListeners(View view) {
-			radioSelect.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			radioSelect
+					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 						@Override
 						public void onCheckedChanged(RadioGroup group,
 								int checkedId) {
-							
+
 							switch (checkedId) {
-							
+
 							case R.id.remindRadioButton:
+								remind = true;
+								notify = false;
+								both = false;
 								notifyLinearLayout.setVisibility(8);
 								remindLinearLayout.setVisibility(0);
 								break;
-								
+
 							case R.id.notifyRadioButton:
+								notify = true;
+								remind = false;
+								both = false;
 								notifyLinearLayout.setVisibility(0);
 								remindLinearLayout.setVisibility(8);
 								break;
-								
+
 							case R.id.bothRadioButton:
+								both = true;
+								remind = false;
+								notify = false;
 								notifyLinearLayout.setVisibility(0);
 								remindLinearLayout.setVisibility(0);
 								break;
@@ -265,12 +302,14 @@ public class MainActivity extends Activity implements LocationListener {
 
 		public void setContactListListeners(View view) {
 
-			pickcontactTextView = (TextView) view.findViewById(R.id.pickcontactTextView);
+			pickcontactTextView = (TextView) view
+					.findViewById(R.id.pickcontactTextView);
 			pickcontactTextView.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+					Intent intent = new Intent(Intent.ACTION_PICK,
+							ContactsContract.Contacts.CONTENT_URI);
 					getActivity().startActivityForResult(intent, PICK_CONTACT);
 				}
 			});
@@ -285,37 +324,124 @@ public class MainActivity extends Activity implements LocationListener {
 				public void onClick(View v) {
 
 					String phoneNumber = contactNumberTextView.getText().toString();
-					String message = "I have reached Creative Capsule Infotech ,Verna(Sent From App)";
+					String message = "I have reached" + locationName;
+					StringBuilder builder = new StringBuilder();
+					MarkerOptions markerOptions = new MarkerOptions();
+					markerOptions.title(locationName).draggable(true)
+							.position(coordinates);
 					
+					if(remind){
+						if(reminderText.getText().toString().length() > 0){
+							builder.delete(0, builder.length());
+							builder.append("Reminder: ");
+							builder.append(reminderText.getText().toString());
+							markerOptions.snippet(builder.toString());
+							googleMap.addMarker(markerOptions);
+							insertReminderInDatabase();
+							dialogFragment.dismiss();
+						}
+						else{
+							Toast.makeText(getActivity(), "Please enter reminders", Toast.LENGTH_SHORT).show();
+						}
+					}
+					
+					
+					else if(notify){
+						if(contactNumberTextView.getText().toString().trim().length() > 0){
+							builder.delete(0, builder.length());
+							builder.append("SMS To: ");
+							builder.append(contactNumberTextView.getText()
+									.toString());
+							markerOptions.snippet(builder.toString());
+							googleMap.addMarker(markerOptions);
+							insertReminderInDatabase();
+							dialogFragment.dismiss();
+						}else{
+							Toast.makeText(getActivity(), "Please enter contact number", Toast.LENGTH_SHORT).show();
+						}
+					}
+
+					
+					else if(both){
+						if(contactNumberTextView.getText().toString().trim().length() > 0 && reminderText.getText().toString().length() > 0){
+							builder.delete(0, builder.length());
+							builder.append("Reminder: ");
+							builder.append(reminderText.getText().toString());
+							builder.append("\n");
+							builder.append("SMS To: ");
+							builder.append(contactNumberTextView.getText()
+									.toString());
+							markerOptions.snippet(builder.toString());
+							googleMap.addMarker(markerOptions);
+							insertReminderInDatabase();
+							dialogFragment.dismiss();
+						}else{
+							Toast.makeText(getActivity(), "Please enter details", Toast.LENGTH_SHORT).show();
+						}
+					}
+					
+					
+					/*if (reminderText.getText().toString().trim().length() > 0) {
+						builder.append("Reminder: ");
+						builder.append(reminderText.getText().toString());
+					}
+
+					if (contactNumberTextView.getText().toString().trim()
+							.length() > 0) {
+						builder.append("\n");
+						builder.append("SMS To: ");
+						builder.append(contactNumberTextView.getText()
+								.toString());
+					}
+
+					
+
+					
+
+					if (phoneNumber.trim().length() > 0) {
 						SmsManager smsManager = SmsManager.getDefault();
 						smsManager.sendTextMessage(phoneNumber, null, message,
-							null, null);
+								null, null);
+					} else {
+						Toast.makeText(getActivity(),
+								"Please enter a contact number",
+								Toast.LENGTH_SHORT).show();
+					}*/
+
+					
+				}
+
+				private void insertReminderInDatabase() {
+					Reminder reminder = new Reminder(null, reminderText
+							.getText().toString(), locationName,
+							String.valueOf(coordinates.latitude), String.valueOf(coordinates.longitude),
+							contactNumberTextView.getText().toString());
+					reminderManager.insertNotification(reminder);
+					Toast.makeText(getActivity(), "" + reminder.getId(), Toast.LENGTH_SHORT).show();
 					
 				}
 			});
 
 		}
-		
-		
+
 		public void cancelButtonListeners(View v) {
 
 			cancelDialogButton.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
-					Toast.makeText(getActivity(), "zzz", Toast.LENGTH_SHORT).show();
-				dialogFragment.dismiss();
+					dialogFragment.dismiss();
 				}
 			});
 
 		}
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onActivityResult(int reqCode, int resultCode, Intent data) {
 		super.onActivityResult(reqCode, resultCode, data);
 		if (reqCode == PICK_CONTACT) {
-			Toast.makeText(this, "Fetched", Toast.LENGTH_SHORT).show();
 
 			if (resultCode == Activity.RESULT_OK) {
 				Uri contactData = data.getData();
@@ -340,7 +466,6 @@ public class MainActivity extends Activity implements LocationListener {
 						String cNumber = phones
 								.getString(phones
 										.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-						Toast.makeText(this, cNumber, Toast.LENGTH_SHORT).show();
 
 						System.out.println("cNumber" + cNumber);
 						contactNumberTextView.setText(cNumber);
@@ -351,9 +476,6 @@ public class MainActivity extends Activity implements LocationListener {
 
 		}
 
-	
-
-}
-
+	}
 
 }
